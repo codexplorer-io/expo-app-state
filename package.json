@@ -1,0 +1,12 @@
+{
+  "name": "@codexporer.io/expo-app-state",
+  "version": "1.0.0",
+  "main": "src/index.js",
+  "peerDependencies": {
+    "react": "*",
+    "react-native": "*",
+    "lodash": "*",
+    "react-magnetic-di": "*",
+    "@codexporer.io/react-test-utils": "*"
+  }
+}
