@@ -12,9 +12,9 @@ export const useAppState = ({ shouldListen }) => {
     const [isInitialized, setIsInitialized] = useState(false);
 
     useEffect(() => {
-        let eventListener = null;
+        let handler = null;
         if (shouldListen) {
-            eventListener = nextAppState => {
+            const listener = nextAppState => {
                 if (isInactive(appState) && isActive(nextAppState)) {
                     setAppState(nextAppState);
                 }
@@ -24,24 +24,21 @@ export const useAppState = ({ shouldListen }) => {
                 }
             };
 
-            AppState.addEventListener(
+            handler = AppState.addEventListener(
                 'change',
-                eventListener
+                listener
             );
 
             if (!isInitialized) {
-                eventListener('active');
+                listener('active');
                 setIsInitialized(true);
             }
         }
 
         return () => {
-            if (eventListener) {
-                eventListener && AppState.removeEventListener(
-                    'change',
-                    eventListener
-                );
-                eventListener = null;
+            if (handler) {
+                handler && handler.remove();
+                handler = null;
             }
         };
     }, [
