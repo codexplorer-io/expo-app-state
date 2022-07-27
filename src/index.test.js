@@ -6,9 +6,11 @@ import { mountWithDi } from '@codexporer.io/react-test-utils';
 import { useAppState } from './index';
 
 jest.mock('react-native/Libraries/AppState/AppState', () => ({
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn()
+    addEventListener: jest.fn()
 }));
+
+const removeEventListener = jest.fn();
+AppState.addEventListener.mockReturnValue({ remove: removeEventListener });
 
 describe('useAppState', () => {
     const createHookRenderer = ({ result, shouldListen }) => () => {
@@ -91,7 +93,7 @@ describe('useAppState', () => {
 
             useEffectResult();
 
-            expect(AppState.removeEventListener).not.toHaveBeenCalled();
+            expect(removeEventListener).not.toHaveBeenCalled();
         });
     });
 
@@ -152,7 +154,7 @@ describe('useAppState', () => {
 
             expect(AppState.addEventListener).toHaveBeenCalledTimes(1);
             expect(AppState.addEventListener).toHaveBeenCalledWith('change', expect.any(Function));
-            expect(AppState.removeEventListener).not.toHaveBeenCalled();
+            expect(removeEventListener).not.toHaveBeenCalled();
             expect(setAppState).toHaveBeenCalledTimes(1);
             expect(setAppState).toHaveBeenCalledWith('active');
             expect(setIsInitialized).toHaveBeenCalledTimes(1);
@@ -161,13 +163,12 @@ describe('useAppState', () => {
             useEffectResult();
 
             // should call listener removal
-            expect(AppState.removeEventListener).toHaveBeenCalledTimes(1);
-            expect(AppState.removeEventListener).toHaveBeenCalledWith('change', expect.any(Function));
+            expect(removeEventListener).toHaveBeenCalledTimes(1);
 
             useEffectResult();
 
             // once removed, should not recall listener removal
-            expect(AppState.removeEventListener).toHaveBeenCalledTimes(1);
+            expect(removeEventListener).toHaveBeenCalledTimes(1);
         });
 
         describe('AppStateListener', () => {
@@ -198,18 +199,17 @@ describe('useAppState', () => {
             };
 
             it('should be removed', () => {
-                const listener = getListener({});
+                getListener({});
 
                 useEffectResult();
 
-                expect(AppState.removeEventListener).toHaveBeenCalledTimes(1);
-                expect(AppState.removeEventListener).toHaveBeenCalledWith('change', listener);
+                expect(removeEventListener).toHaveBeenCalledTimes(1);
             });
 
             it('should not be removed', () => {
                 getListener({});
 
-                expect(AppState.removeEventListener).not.toHaveBeenCalled();
+                expect(removeEventListener).not.toHaveBeenCalled();
             });
 
             it('should set active state if current state is inactive', () => {
