@@ -1,13 +1,10 @@
 import { useState, useEffect, useMemo } from 'react';
 import { AppState } from 'react-native';
-import { di } from 'react-magnetic-di';
 
 const isActive = appState => appState === 'active';
 const isInactive = appState => !!appState.match(/inactive|background/);
 
 export const useAppState = ({ shouldListen }) => {
-    di(useEffect, useMemo, useState);
-
     const [appState, setAppState] = useState('inactive');
     const [isInitialized, setIsInitialized] = useState(false);
 
